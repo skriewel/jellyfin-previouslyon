@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Previously On</title>
+</head>
+<body>
+<div id="PreviouslyOnConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
+    <div data-role="content">
+        <div class="content-primary">
+            <form id="PreviouslyOnConfigForm">
+                <div class="verticalSection">
+                    <h2 class="sectionTitle">Previously On</h2>
+                    <p class="fieldDescription">When an episode starts after a long break from its series, the web client first shows what happened in the previous episodes. The text comes from the episode and season descriptions already in your library; nothing is looked up elsewhere. Only episodes before the one starting are shown, so nothing ahead is spoiled.</p>
+                </div>
+
+                <div class="checkboxContainer">
+                    <label class="emby-checkbox-label">
+                        <input id="Enabled" type="checkbox" is="emby-checkbox" />
+                        <span>Show the recap in the web client</span>
+                    </label>
+                </div>
+
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="MinGapDays">Break before a recap (days)</label>
+                    <input id="MinGapDays" type="number" is="emby-input" min="0" max="3650" />
+                    <div class="fieldDescription">Days since the user last played anything of the series. 0 shows the recap every time (useful for testing).</div>
+                </div>
+                <div class="inputContainer">
+                    <label class="inputLabel inputLabelUnfocused" for="EpisodeCount">Previous episodes in the recap</label>
+                    <input id="EpisodeCount" type="number" is="emby-input" min="1" max="10" />
+                </div>
+                <div class="checkboxContainer checkboxContainer-withDescription">
+                    <label class="emby-checkbox-label">
+                        <input id="IncludeSeasonOverview" type="checkbox" is="emby-checkbox" />
+                        <span>Add the previous season's description when a new season starts</span>
+                    </label>
+                    <div class="fieldDescription checkboxFieldDescription">Only if the season has a description in the metadata.</div>
+                </div>
+                <div class="checkboxContainer">
+                    <label class="emby-checkbox-label">
+                        <input id="ShowImages" type="checkbox" is="emby-checkbox" />
+                        <span>Show episode images</span>
+                    </label>
+                </div>
+
+                <div>
+                    <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Save</span></button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        (function () {
+            var pluginId = '6257f11a-c7cd-4fc5-b2c0-2e327ccf7c7d';
+            var page = document.querySelector('#PreviouslyOnConfigPage');
+            var bools = ['Enabled', 'IncludeSeasonOverview', 'ShowImages'];
+            var numbers = ['MinGapDays', 'EpisodeCount'];
+
+            page.addEventListener('pageshow', function () {
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    bools.forEach(function (k) { page.querySelector('#' + k).checked = !!config[k]; });
+                    numbers.forEach(function (k) { page.querySelector('#' + k).value = config[k]; });
+                }).finally(function () { Dashboard.hideLoadingMsg(); });
+            });
+
+            page.querySelector('#PreviouslyOnConfigForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                Dashboard.showLoadingMsg();
+                ApiClient.getPluginConfiguration(pluginId).then(function (config) {
+                    bools.forEach(function (k) { config[k] = page.querySelector('#' + k).checked; });
+                    numbers.forEach(function (k) { config[k] = parseInt(page.querySelector('#' + k).value, 10) || 0; });
+                    if (config.EpisodeCount < 1) config.EpisodeCount = 1;
+                    return ApiClient.updatePluginConfiguration(pluginId, config);
+                }).then(function (result) {
+                    Dashboard.processPluginConfigurationUpdateResult(result);
+                }).finally(function () { Dashboard.hideLoadingMsg(); });
+                return false;
+            });
+        })();
+    </script>
+</div>
+</body>
+</html>

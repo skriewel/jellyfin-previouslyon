@@ -1,0 +1,109 @@
+.po-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4vh 4vw;
+    box-sizing: border-box;
+    color: #fff;
+    animation: po-in .2s ease-out;
+}
+/* Jellyfin's loading spinner waits for the held-back request; hide it while the recap is open. */
+.po-open .docspinner { display: none !important; }
+.po-overlay.po-closing { animation: po-out .18s ease-in forwards; }
+@keyframes po-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes po-out { to { opacity: 0; } }
+
+.po-backdrop {
+    position: absolute;
+    inset: 0;
+    background: #000 center / cover no-repeat;
+    cursor: pointer;
+}
+.po-backdrop::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,.72), rgba(0,0,0,.88));
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.po-panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: min(56em, 100%);
+    max-height: 100%;
+    background: rgba(24, 24, 28, .86);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    overflow: hidden;
+}
+
+.po-head { padding: 1.4em 1.6em .8em; }
+.po-series { font-size: .9em; letter-spacing: .06em; text-transform: uppercase; opacity: .7; }
+.po-title { margin: .1em 0 .15em; font-size: 2em; font-weight: 600; line-height: 1.15; }
+.po-ago { font-size: .9em; opacity: .65; }
+
+.po-list {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: .2em 1.6em 1em;
+    overscroll-behavior: contain;
+}
+.po-item {
+    display: flex;
+    gap: 1.1em;
+    align-items: flex-start;
+    padding: .9em 0;
+    border-top: 1px solid rgba(255,255,255,.08);
+}
+.po-item:first-child { border-top: 0; }
+.po-thumb {
+    flex: 0 0 auto;
+    width: 13em;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 6px;
+    background: rgba(255,255,255,.06);
+}
+.po-text { min-width: 0; }
+.po-name { margin: 0 0 .35em; font-size: 1.05em; font-weight: 600; }
+.po-num {
+    display: inline-block;
+    margin-right: .6em;
+    padding: .05em .45em;
+    font-size: .8em;
+    font-weight: 600;
+    border-radius: 4px;
+    background: rgba(255,255,255,.12);
+    vertical-align: .1em;
+}
+.po-text p { margin: 0; line-height: 1.5; opacity: .88; }
+.po-missing { font-style: italic; opacity: .5 !important; }
+.po-season { padding-bottom: 1.1em; }
+.po-season .po-name { opacity: .75; font-size: .95em; text-transform: uppercase; letter-spacing: .05em; }
+
+.po-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding: .9em 1.6em 1.2em;
+    border-top: 1px solid rgba(255,255,255,.08);
+}
+.po-actions .po-play { margin: 0; display: inline-flex; align-items: center; gap: .4em; }
+
+@media (max-width: 40em) {
+    .po-overlay { padding: 0; }
+    .po-panel { border-radius: 0; height: 100%; }
+    .po-head, .po-list, .po-actions { padding-left: 1em; padding-right: 1em; }
+    .po-title { font-size: 1.5em; }
+    .po-item { gap: .8em; }
+    .po-thumb { width: 6.5em; }
+    .po-name { font-size: 1em; }
+    .po-num { display: table; margin: 0 0 .25em; }
+    .po-actions .po-play { width: 100%; justify-content: center; }
+}
